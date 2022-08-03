@@ -1,3 +1,5 @@
+mod ppm;
+
 // Primitives
 // ==========
 
@@ -14,13 +16,13 @@ impl From<u32> for Color {
 }
 
 #[derive(Debug)]
-struct Point {
+pub(crate) struct Point {
     x: f64,
     y: f64,
 }
 
 #[derive(Debug)]
-struct Dimension {
+pub(crate) struct Dimension {
     w: f64,
     h: f64,
 }
@@ -29,6 +31,10 @@ struct Block(f64, f64);
 
 // Shapes
 // ======
+
+trait ShapeRenderer {
+    fn draw(&self, shape: Renderable, buffer_size: &Dimension, buffer: &mut Vec<u8>);
+}
 
 trait Shape {
     fn fill(&self, color: Color, buffer_size: &Dimension, buffer: &mut Vec<u8>);
@@ -39,6 +45,11 @@ trait Shape {
 struct Rect {
     position: Point,
     size: Dimension,
+}
+
+pub(crate) enum Renderable {
+    Rect(Point, Dimension, Color),
+    Frame(Point, Dimension, Color, f64),
 }
 
 impl Shape for Rect {
@@ -114,8 +125,6 @@ impl Shape for Rect {
 
 // Graphs
 // ======
-
-mod ppm;
 
 struct Graph<'a> {
     size: Dimension,
