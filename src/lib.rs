@@ -83,38 +83,44 @@ impl Shape for Rect {
 // Graphs
 // ======
 
-struct Graph {
+mod ppm;
+
+struct Graph<'a> {
     size: Dimension,
     base: Block,
+    blocks: &'a [Block],
 }
 
-use std::io::{BufWriter,Write};
-use std::fs::File;
+impl<'a> Graph<'a> {
 
-impl Graph {
-    #[allow(clippy::unused_io_amount)]
-    pub fn write(&self, fname: &str, raw: &[Block]) -> std::io::Result<()> {
-        let mut p = BufWriter::new(File::create(fname)?);
-        p.write(format!("P6 {} {} 255\n", self.size.w, self.size.h).as_bytes())?;
-
-        let buffer = self.draw(raw);
-        p.write(&buffer)?;
-
-        Ok(())
+    pub fn new(blocks: &'a [Block]) -> Self {
+        let base = Block(10.0, 5.0);
+        let width = blocks.iter().fold(0.0, |total, block| total + block.0 * base.0);
+        let height = blocks.iter().fold(0.0, |total, block| total + block.1 * base.1);
+        Self{
+            size: Dimension {
+                w: width,
+                h: height,
+            },
+            base,
+            blocks,
+        }
     }
-    fn draw(&self, blocks: &[Block]) -> Vec<u8> {
+
+    fn draw(&self) -> Vec<u8> {
         let max_size = (self.size.w * self.size.h) as usize * 3;
         let mut buffer = vec![0; max_size];
-        for rect in self.rects(blocks) {
+        for rect in self.rects() {
             rect.frame(Color::from(0xDEAF00), 1.0, &self.size, &mut buffer);
             // rect.fill(Color::from(0xDEAD00), &self.size, &mut buffer);
         }
 
         buffer
     }
-    fn rects(&self, blocks: &[Block]) -> Vec<Rect> {
+
+    fn rects(&self) -> Vec<Rect> {
         let mut prev = Point{ x: 0.0, y: 0.0 };
-        blocks.iter().map(|block| {
+        self.blocks.iter().map(|block| {
             let rect = Rect{
                 position: Point{
                     x: prev.x,
@@ -132,36 +138,23 @@ impl Graph {
     }
 }
 
+trait GraphFileWriter {
+    fn write(&self, fname: &str, graph: &Graph) -> std::io::Result<()>;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn graph_draw() {
-        let graph = Graph{
-            size: Dimension{ w: 300.0, h: 300.0 },
-            base: Block(10.0, 10.0)
-        };
-        graph.write("foo.ppm", &[
-            Block(4.0, 1.0),
-            Block(4.0, 3.0),
-            Block(4.0, 1.0),
-            Block(4.0, 2.0),
-        ]);
-    }
-
-    #[test]
     fn graph_rects() {
-        let graph = Graph{
-            size: Dimension{ w: 200.0, h: 200.0 },
-            base: Block(10.0, 5.0)
-        };
-        let rects = graph.rects(&[
+        let graph = Graph::new(&[
             Block(4.0, 1.0),
             Block(4.0, 3.0),
             Block(4.0, 1.0),
             Block(4.0, 2.0),
         ]);
+        let rects = graph.rects();
 
         assert_eq!(rects.len(), 4);
 
