@@ -60,23 +60,52 @@ impl Shape for Rect {
         }
     }
     fn frame(&self, color: Color, thickness: f64, buffer_size: &Dimension, buffer: &mut Vec<u8>) {
-        let ystart = self.position.y as usize;
-        let yend = (self.position.y + self.size.h) as usize;
-        let xstart = self.position.x as usize;
-        let xend = (self.position.x + self.size.w) as usize;
-        let t = thickness as usize;
-        let width = buffer_size.w as usize;
-
-        for y in ystart..yend {
-            for x in xstart..xend {
-                if (y < ystart + t || y >= yend - t) || (x < xstart + t || x >= xend - t) {
-                    let offset = (y * width * 3) + (x * 3);
-                    buffer[offset] = color.0;
-                    buffer[offset+1] = color.1;
-                    buffer[offset+2] = color.2;
-                }
+        let mut pixel = |x: usize, y: usize| {
+            let offset = (y * (buffer_size.w as usize) * 3) + (x * 3);
+            buffer[offset] = color.0;
+            buffer[offset+1] = color.1;
+            buffer[offset+2] = color.2;
+        };
+        // top
+        for y in (self.position.y as usize)..((self.position.y + thickness) as usize) {
+            for x in (self.position.x as usize)..((self.position.x + self.size.w) as usize) {
+                pixel(x, y);
             }
         }
+        // bottom
+        for y in (((self.position.y + self.size.h) - thickness) as usize)..((self.position.y + self.size.h) as usize) {
+            for x in (self.position.x as usize)..((self.position.x + self.size.w) as usize) {
+                pixel(x, y);
+            }
+        }
+        // sides
+        for y in (self.position.y as usize)..((self.position.y + self.size.h) as usize) {
+            // left
+            for x in (self.position.x as usize)..((self.position.x + thickness) as usize) {
+                pixel(x, y);
+            }
+            // right
+            for x in (((self.position.x + self.size.w) - thickness) as usize)..((self.position.x + self.size.w) as usize) {
+                pixel(x, y);
+            }
+        }
+        // let ystart = self.position.y as usize;
+        // let yend = (self.position.y + self.size.h) as usize;
+        // let xstart = self.position.x as usize;
+        // let xend = (self.position.x + self.size.w) as usize;
+        // let t = thickness as usize;
+        // let width = buffer_size.w as usize;
+
+        // for y in ystart..yend {
+        //     for x in xstart..xend {
+        //         if (y < ystart + t || y >= yend - t) || (x < xstart + t || x >= xend - t) {
+        //             let offset = (y * width * 3) + (x * 3);
+        //             buffer[offset] = color.0;
+        //             buffer[offset+1] = color.1;
+        //             buffer[offset+2] = color.2;
+        //         }
+        //     }
+        // }
     }
 }
 
