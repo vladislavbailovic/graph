@@ -33,7 +33,8 @@ struct Block(f64, f64);
 // ======
 
 trait ShapeRenderer {
-    fn draw(&self, shape: Renderable, buffer_size: &Dimension, buffer: &mut Vec<u8>);
+    fn draw(&mut self, shape: Renderable);
+    fn get_buffer(&self) -> Vec<u8>;
 }
 
 pub(crate) enum Renderable {
@@ -69,14 +70,12 @@ impl<'a> Graph<'a> {
         }
     }
 
-    fn draw(&self, renderer: impl ShapeRenderer) -> Vec<u8> {
-        let max_size = (self.size.w * self.size.h) as usize * 3;
-        let mut buffer = vec![0; max_size];
+    fn draw(&self, mut renderer: impl ShapeRenderer) -> Vec<u8> {
         for rect in self.renderables() {
-            renderer.draw(rect, &self.size, &mut buffer);
+            renderer.draw(rect);
         }
 
-        buffer
+        renderer.get_buffer()
     }
 
     fn renderables(&self) -> Vec<Renderable> {
@@ -132,7 +131,7 @@ mod tests {
             Block(4.0, 1.0),
             Block(4.0, 2.0),
         ]);
-        let renderer = ppm::Renderer {};
+        let renderer = ppm::Renderer::new(&graph.size);
         let buf = graph.draw(renderer);
 
         assert_eq!(buf.len(), (graph.size.w * graph.size.h) as usize * 3);

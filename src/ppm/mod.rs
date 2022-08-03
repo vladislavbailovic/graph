@@ -10,7 +10,7 @@ impl GraphFileWriter for Writer {
         let mut p = BufWriter::new(File::create(fname)?);
         p.write(format!("P6 {} {} 255\n", graph.size.w, graph.size.h).as_bytes())?;
 
-        let renderer = Renderer {};
+        let renderer = Renderer::new(&graph.size);
         let buffer = graph.draw(renderer);
         p.write(&buffer)?;
 
@@ -19,57 +19,59 @@ impl GraphFileWriter for Writer {
 }
 
 use crate::{Color, Dimension, Point, Renderable, ShapeRenderer};
-pub struct Renderer;
+pub(crate) struct Renderer {
+    size: Dimension,
+    buffer: Vec<u8>,
+}
 impl ShapeRenderer for Renderer {
-    fn draw(&self, shape: Renderable, buffer_size: &Dimension, buffer: &mut Vec<u8>) {
+    fn draw(&mut self, shape: Renderable) {
         match shape {
-            Renderable::Rect(pos, size, col) => self.rect(pos, size, col, buffer_size, buffer),
-            Renderable::Frame(pos, size, col, thickness) => {
-                self.frame(pos, size, col, thickness, buffer_size, buffer)
-            }
+            Renderable::Rect(pos, size, col) => self.rect(pos, size, col),
+            Renderable::Frame(pos, size, col, thickness) => self.frame(pos, size, col, thickness),
         };
+    }
+
+    fn get_buffer(&self) -> Vec<u8> {
+        self.buffer.to_owned()
     }
 }
 
 impl Renderer {
-    fn rect(
-        &self,
-        pos: Point,
-        size: Dimension,
-        color: Color,
-        buffer_size: &Dimension,
-        buffer: &mut Vec<u8>,
-    ) {
+    pub fn new(size: &Dimension) -> Self {
+        let max_size = (size.w * size.h) as usize * 3;
+        let buffer = vec![0; max_size];
+        Self {
+            size: Dimension {
+                w: size.w,
+                h: size.h,
+            },
+            buffer,
+        }
+    }
+
+    fn rect(&mut self, pos: Point, size: Dimension, color: Color) {
         let ystart = pos.y as usize;
         let yend = (pos.y + size.h) as usize;
         let xstart = pos.x as usize;
         let xend = (pos.x + size.w) as usize;
-        let width = buffer_size.w as usize;
+        let width = self.size.w as usize;
 
         for y in ystart..yend {
             for x in xstart..xend {
                 let offset = (y * width * 3) + (x * 3);
-                buffer[offset] = color.0;
-                buffer[offset + 1] = color.1;
-                buffer[offset + 2] = color.2;
+                self.buffer[offset] = color.0;
+                self.buffer[offset + 1] = color.1;
+                self.buffer[offset + 2] = color.2;
             }
         }
     }
 
-    fn frame(
-        &self,
-        pos: Point,
-        size: Dimension,
-        color: Color,
-        thickness: f64,
-        buffer_size: &Dimension,
-        buffer: &mut Vec<u8>,
-    ) {
+    fn frame(&mut self, pos: Point, size: Dimension, color: Color, thickness: f64) {
         let mut pixel = |x: usize, y: usize| {
-            let offset = (y * (buffer_size.w as usize) * 3) + (x * 3);
-            buffer[offset] = color.0;
-            buffer[offset + 1] = color.1;
-            buffer[offset + 2] = color.2;
+            let offset = (y * (self.size.w as usize) * 3) + (x * 3);
+            self.buffer[offset] = color.0;
+            self.buffer[offset + 1] = color.1;
+            self.buffer[offset + 2] = color.2;
         };
         // top
         for y in (pos.y as usize)..((pos.y + thickness) as usize) {
@@ -99,15 +101,15 @@ impl Renderer {
         // let xstart = pos.x as usize;
         // let xend = (pos.x + size.w) as usize;
         // let t = thickness as usize;
-        // let width = buffer_size.w as usize;
+        // let width = self.size.w as usize;
 
         // for y in ystart..yend {
         //     for x in xstart..xend {
         //         if (y < ystart + t || y >= yend - t) || (x < xstart + t || x >= xend - t) {
         //             let offset = (y * width * 3) + (x * 3);
-        //             buffer[offset] = color.0;
-        //             buffer[offset+1] = color.1;
-        //             buffer[offset+2] = color.2;
+        //             self.buffer[offset] = color.0;
+        //             self.buffer[offset+1] = color.1;
+        //             self.buffer[offset+2] = color.2;
         //         }
         //     }
         // }
