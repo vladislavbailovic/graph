@@ -10,27 +10,36 @@ impl GraphFileWriter for Writer {
         let mut p = BufWriter::new(File::create(fname)?);
         p.write(format!("P6 {} {} 255\n", graph.size.w, graph.size.h).as_bytes())?;
 
-        let buffer = graph.draw();
+        let renderer = Renderer {};
+        let buffer = graph.draw(renderer);
         p.write(&buffer)?;
 
         Ok(())
     }
 }
 
-use crate::{ShapeRenderer, Dimension, Renderable, Color, Point};
+use crate::{Color, Dimension, Point, Renderable, ShapeRenderer};
 pub struct Renderer;
 impl ShapeRenderer for Renderer {
     fn draw(&self, shape: Renderable, buffer_size: &Dimension, buffer: &mut Vec<u8>) {
         match shape {
             Renderable::Rect(pos, size, col) => self.rect(pos, size, col, buffer_size, buffer),
-            Renderable::Frame(pos, size, col, thickness) => self.frame(pos, size, col, thickness, buffer_size, buffer),
+            Renderable::Frame(pos, size, col, thickness) => {
+                self.frame(pos, size, col, thickness, buffer_size, buffer)
+            }
         };
     }
 }
 
 impl Renderer {
-
-    fn rect(&self, pos: Point, size: Dimension, color: Color, buffer_size: &Dimension, buffer: &mut Vec<u8>) {
+    fn rect(
+        &self,
+        pos: Point,
+        size: Dimension,
+        color: Color,
+        buffer_size: &Dimension,
+        buffer: &mut Vec<u8>,
+    ) {
         let ystart = pos.y as usize;
         let yend = (pos.y + size.h) as usize;
         let xstart = pos.x as usize;
@@ -47,7 +56,15 @@ impl Renderer {
         }
     }
 
-    fn frame(&self, pos: Point, size: Dimension, color: Color, thickness: f64, buffer_size: &Dimension, buffer: &mut Vec<u8>) {
+    fn frame(
+        &self,
+        pos: Point,
+        size: Dimension,
+        color: Color,
+        thickness: f64,
+        buffer_size: &Dimension,
+        buffer: &mut Vec<u8>,
+    ) {
         let mut pixel = |x: usize, y: usize| {
             let offset = (y * (buffer_size.w as usize) * 3) + (x * 3);
             buffer[offset] = color.0;
@@ -61,9 +78,7 @@ impl Renderer {
             }
         }
         // bottom
-        for y in (((pos.y + size.h) - thickness) as usize)
-            ..((pos.y + size.h) as usize)
-        {
+        for y in (((pos.y + size.h) - thickness) as usize)..((pos.y + size.h) as usize) {
             for x in (pos.x as usize)..((pos.x + size.w) as usize) {
                 pixel(x, y);
             }
@@ -75,9 +90,7 @@ impl Renderer {
                 pixel(x, y);
             }
             // right
-            for x in (((pos.x + size.w) - thickness) as usize)
-                ..((pos.x + size.w) as usize)
-            {
+            for x in (((pos.x + size.w) - thickness) as usize)..((pos.x + size.w) as usize) {
                 pixel(x, y);
             }
         }
