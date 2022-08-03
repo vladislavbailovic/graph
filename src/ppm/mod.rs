@@ -1,7 +1,7 @@
-use std::io::{BufWriter,Write};
 use std::fs::File;
+use std::io::{BufWriter, Write};
 
-use crate::{GraphFileWriter,Graph};
+use crate::{Graph, GraphFileWriter};
 
 pub struct Writer;
 impl GraphFileWriter for Writer {
@@ -20,22 +20,21 @@ impl GraphFileWriter for Writer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{Graph,Block};
+    use crate::{Block, Graph};
 
     #[test]
-    fn graph_draw() {
+    fn graph_draw_save() {
         let graph = Graph::new(&[
             Block(4.0, 1.0),
             Block(4.0, 3.0),
             Block(4.0, 1.0),
             Block(4.0, 2.0),
         ]);
-        let w = Writer{};
+        let w = Writer {};
         if let Err(e) = w.write("foo.ppm", &graph) {
             assert!(false, "{:#?}", e);
         } else {
             assert!(true, "File created");
         }
     }
-
 }

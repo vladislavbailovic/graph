@@ -4,7 +4,7 @@
 struct Color(u8, u8, u8);
 
 impl From<u32> for Color {
-    fn from(raw: u32) -> Self{
+    fn from(raw: u32) -> Self {
         Self(
             ((raw >> 16) & 255) as u8,
             ((raw >> 8) & 255) as u8,
@@ -35,7 +35,6 @@ trait Shape {
     fn frame(&self, color: Color, thickness: f64, buffer_size: &Dimension, buffer: &mut Vec<u8>);
 }
 
-
 #[derive(Debug)]
 struct Rect {
     position: Point,
@@ -54,8 +53,8 @@ impl Shape for Rect {
             for x in xstart..xend {
                 let offset = (y * width * 3) + (x * 3);
                 buffer[offset] = color.0;
-                buffer[offset+1] = color.1;
-                buffer[offset+2] = color.2;
+                buffer[offset + 1] = color.1;
+                buffer[offset + 2] = color.2;
             }
         }
     }
@@ -63,8 +62,8 @@ impl Shape for Rect {
         let mut pixel = |x: usize, y: usize| {
             let offset = (y * (buffer_size.w as usize) * 3) + (x * 3);
             buffer[offset] = color.0;
-            buffer[offset+1] = color.1;
-            buffer[offset+2] = color.2;
+            buffer[offset + 1] = color.1;
+            buffer[offset + 2] = color.2;
         };
         // top
         for y in (self.position.y as usize)..((self.position.y + thickness) as usize) {
@@ -73,7 +72,9 @@ impl Shape for Rect {
             }
         }
         // bottom
-        for y in (((self.position.y + self.size.h) - thickness) as usize)..((self.position.y + self.size.h) as usize) {
+        for y in (((self.position.y + self.size.h) - thickness) as usize)
+            ..((self.position.y + self.size.h) as usize)
+        {
             for x in (self.position.x as usize)..((self.position.x + self.size.w) as usize) {
                 pixel(x, y);
             }
@@ -85,7 +86,9 @@ impl Shape for Rect {
                 pixel(x, y);
             }
             // right
-            for x in (((self.position.x + self.size.w) - thickness) as usize)..((self.position.x + self.size.w) as usize) {
+            for x in (((self.position.x + self.size.w) - thickness) as usize)
+                ..((self.position.x + self.size.w) as usize)
+            {
                 pixel(x, y);
             }
         }
@@ -121,12 +124,15 @@ struct Graph<'a> {
 }
 
 impl<'a> Graph<'a> {
-
     pub fn new(blocks: &'a [Block]) -> Self {
         let base = Block(10.0, 5.0);
-        let width = blocks.iter().fold(0.0, |total, block| total + block.0 * base.0);
-        let height = blocks.iter().fold(0.0, |total, block| total + block.1 * base.1);
-        Self{
+        let width = blocks
+            .iter()
+            .fold(0.0, |total, block| total + block.0 * base.0);
+        let height = blocks
+            .iter()
+            .fold(0.0, |total, block| total + block.1 * base.1);
+        Self {
             size: Dimension {
                 w: width,
                 h: height,
@@ -148,22 +154,25 @@ impl<'a> Graph<'a> {
     }
 
     fn rects(&self) -> Vec<Rect> {
-        let mut prev = Point{ x: 0.0, y: 0.0 };
-        self.blocks.iter().map(|block| {
-            let rect = Rect{
-                position: Point{
-                    x: prev.x,
-                    y: block.1 * self.base.1,
-                },
-                size: Dimension {
-                    w: block.0 * self.base.0,
-                    h: self.base.1,
-                }
-            };
+        let mut prev = Point { x: 0.0, y: 0.0 };
+        self.blocks
+            .iter()
+            .map(|block| {
+                let rect = Rect {
+                    position: Point {
+                        x: prev.x,
+                        y: block.1 * self.base.1,
+                    },
+                    size: Dimension {
+                        w: block.0 * self.base.0,
+                        h: self.base.1,
+                    },
+                };
 
-            prev.x += rect.size.w;
-            rect
-        }).collect::<Vec<Rect>>()
+                prev.x += rect.size.w;
+                rect
+            })
+            .collect::<Vec<Rect>>()
     }
 }
 
@@ -174,6 +183,32 @@ trait GraphFileWriter {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn graph_dimensions_from_blocks() {
+        let graph = Graph::new(&[
+            Block(4.0, 1.0),
+            Block(4.0, 3.0),
+            Block(4.0, 1.0),
+            Block(4.0, 2.0),
+        ]);
+
+        assert_eq!(graph.size.w, 160.0, "graph width");
+        assert_eq!(graph.size.h, 35.0, "graph height");
+    }
+
+    #[test]
+    fn graph_draw() {
+        let graph = Graph::new(&[
+            Block(4.0, 1.0),
+            Block(4.0, 3.0),
+            Block(4.0, 1.0),
+            Block(4.0, 2.0),
+        ]);
+        let buf = graph.draw();
+
+        assert_eq!(buf.len(), (graph.size.w * graph.size.h) as usize * 3);
+    }
 
     #[test]
     fn graph_rects() {
@@ -211,27 +246,30 @@ mod tests {
     #[test]
     fn it_works() {
         let base = Block(10.0, 5.0);
-        let mut prev = Point{ x: 0.0, y: 0.0 };
+        let mut prev = Point { x: 0.0, y: 0.0 };
         let rects = vec![
             Block(4.0, 1.0),
             Block(4.0, 3.0),
             Block(4.0, 1.0),
             Block(4.0, 2.0),
-        ].iter().map(|block| {
-            let rect = Rect{
-                position: Point{
+        ]
+        .iter()
+        .map(|block| {
+            let rect = Rect {
+                position: Point {
                     x: prev.x,
                     y: block.1 * base.1,
                 },
                 size: Dimension {
                     w: block.0 * base.0,
                     h: base.1,
-                }
+                },
             };
 
             prev.x += rect.size.w;
             rect
-        }).collect::<Vec<Rect>>();
+        })
+        .collect::<Vec<Rect>>();
 
         assert_eq!(rects.len(), 4);
 
