@@ -1,31 +1,3 @@
-use std::fs::File;
-use std::io::{BufWriter, Write};
-
-use crate::{Graph, GraphFileWriter};
-
-pub struct Writer;
-impl GraphFileWriter for Writer {
-    #[allow(clippy::unused_io_amount)]
-    fn write(&self, fname: &str, graph: &Graph) -> std::io::Result<()> {
-        let mut p = BufWriter::new(File::create(fname)?);
-
-        let renderer = Renderer::new(&graph.size);
-        let header = &renderer.get_header();
-        let footer = &renderer.get_footer();
-
-        if let Some(header) = header {
-            p.write(&header)?;
-        }
-        let buffer = graph.draw(renderer);
-        p.write(&buffer)?;
-        if let Some(footer) = footer {
-            p.write(&footer)?;
-        }
-
-        Ok(())
-    }
-}
-
 use crate::{Color, Dimension, ImageRenderer, Point, Renderable, ShapeRenderer};
 pub(crate) struct Renderer {
     size: Dimension,
@@ -130,27 +102,5 @@ impl Renderer {
         //         }
         //     }
         // }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::{Block, Graph};
-
-    #[test]
-    fn graph_draw_save() {
-        let graph = Graph::new(&[
-            Block(4.0, 1.0),
-            Block(4.0, 3.0),
-            Block(4.0, 1.0),
-            Block(4.0, 2.0),
-        ]);
-        let w = Writer {};
-        if let Err(e) = w.write("foo.ppm", &graph) {
-            assert!(false, "{:#?}", e);
-        } else {
-            assert!(true, "File created");
-        }
     }
 }

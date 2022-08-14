@@ -1,4 +1,5 @@
 mod ppm;
+mod writer;
 
 // Primitives
 // ==========
@@ -37,7 +38,7 @@ trait ShapeRenderer {
     fn get_buffer(&self) -> &[u8];
 }
 
-trait ImageRenderer {
+trait ImageRenderer: ShapeRenderer {
     fn get_header(&self) -> Option<Vec<u8>>;
     fn get_footer(&self) -> Option<Vec<u8>>;
 }
@@ -105,10 +106,6 @@ impl<'a> Graph<'a> {
             })
             .collect::<Vec<Renderable>>()
     }
-}
-
-trait GraphFileWriter {
-    fn write(&self, fname: &str, graph: &Graph) -> std::io::Result<()>;
 }
 
 #[cfg(test)]
