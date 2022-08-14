@@ -34,7 +34,12 @@ struct Block(f64, f64);
 
 trait ShapeRenderer {
     fn draw(&mut self, shape: Renderable);
-    fn get_buffer(&self) -> Vec<u8>;
+    fn get_buffer(&self) -> &[u8];
+}
+
+trait ImageRenderer {
+    fn get_header(&self) -> Option<Vec<u8>>;
+    fn get_footer(&self) -> Option<Vec<u8>>;
 }
 
 pub(crate) enum Renderable {
@@ -75,7 +80,7 @@ impl<'a> Graph<'a> {
             renderer.draw(rect);
         }
 
-        renderer.get_buffer()
+        renderer.get_buffer().to_vec()
     }
 
     fn renderables(&self) -> Vec<Renderable> {

@@ -8,17 +8,25 @@ impl GraphFileWriter for Writer {
     #[allow(clippy::unused_io_amount)]
     fn write(&self, fname: &str, graph: &Graph) -> std::io::Result<()> {
         let mut p = BufWriter::new(File::create(fname)?);
-        p.write(format!("P6 {} {} 255\n", graph.size.w, graph.size.h).as_bytes())?;
 
         let renderer = Renderer::new(&graph.size);
+        let header = &renderer.get_header();
+        let footer = &renderer.get_footer();
+
+        if let Some(header) = header {
+            p.write(&header)?;
+        }
         let buffer = graph.draw(renderer);
         p.write(&buffer)?;
+        if let Some(footer) = footer {
+            p.write(&footer)?;
+        }
 
         Ok(())
     }
 }
 
-use crate::{Color, Dimension, Point, Renderable, ShapeRenderer};
+use crate::{Color, Dimension, ImageRenderer, Point, Renderable, ShapeRenderer};
 pub(crate) struct Renderer {
     size: Dimension,
     buffer: Vec<u8>,
@@ -31,8 +39,17 @@ impl ShapeRenderer for Renderer {
         };
     }
 
-    fn get_buffer(&self) -> Vec<u8> {
-        self.buffer.to_owned()
+    fn get_buffer(&self) -> &[u8] {
+        &self.buffer
+    }
+}
+
+impl ImageRenderer for Renderer {
+    fn get_header(&self) -> Option<Vec<u8>> {
+        Some(format!("P6 {} {} 255\n", self.size.w, self.size.h).into_bytes())
+    }
+    fn get_footer(&self) -> Option<Vec<u8>> {
+        None
     }
 }
 
