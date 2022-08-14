@@ -1,13 +1,21 @@
 use crate::{Color, Dimension, ImageRenderer, Point, Renderable, ShapeRenderer};
+
 pub(crate) struct Renderer {
     size: Dimension,
     buffer: Vec<u8>,
 }
+
 impl ShapeRenderer for Renderer {
     fn draw(&mut self, shape: Renderable) {
         match shape {
-            Renderable::Rect(pos, size, col) => self.rect(pos, size, col),
-            Renderable::Frame(pos, size, col, thickness) => self.frame(pos, size, col, thickness),
+            Renderable::Rect(pos, size, style) => {
+                if style.has_fill() {
+                    self.rect(pos, size, style.get_color());
+                }
+                if let Some((color, thickness)) = style.get_frame() {
+                    self.frame(pos, size, color, thickness);
+                }
+            }
         };
     }
 
@@ -38,7 +46,7 @@ impl Renderer {
         }
     }
 
-    fn rect(&mut self, pos: Point, size: Dimension, color: Color) {
+    fn rect(&mut self, pos: Point, size: Dimension, color: &Color) {
         let ystart = pos.y as usize;
         let yend = (pos.y + size.h) as usize;
         let xstart = pos.x as usize;
@@ -55,7 +63,7 @@ impl Renderer {
         }
     }
 
-    fn frame(&mut self, pos: Point, size: Dimension, color: Color, thickness: f64) {
+    fn frame(&mut self, pos: Point, size: Dimension, color: &Color, thickness: f64) {
         let mut pixel = |x: usize, y: usize| {
             let offset = (y * (self.size.w as usize) * 3) + (x * 3);
             self.buffer[offset] = color.0;
@@ -85,22 +93,5 @@ impl Renderer {
                 pixel(x, y);
             }
         }
-        // let ystart = pos.y as usize;
-        // let yend = (pos.y + size.h) as usize;
-        // let xstart = pos.x as usize;
-        // let xend = (pos.x + size.w) as usize;
-        // let t = thickness as usize;
-        // let width = self.size.w as usize;
-
-        // for y in ystart..yend {
-        //     for x in xstart..xend {
-        //         if (y < ystart + t || y >= yend - t) || (x < xstart + t || x >= xend - t) {
-        //             let offset = (y * width * 3) + (x * 3);
-        //             self.buffer[offset] = color.0;
-        //             self.buffer[offset+1] = color.1;
-        //             self.buffer[offset+2] = color.2;
-        //         }
-        //     }
-        // }
     }
 }

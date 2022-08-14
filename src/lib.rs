@@ -1,28 +1,19 @@
 mod ppm;
+mod style;
 mod writer;
+
+use style::*;
 
 // Primitives
 // ==========
 
-struct Color(u8, u8, u8);
-
-impl From<u32> for Color {
-    fn from(raw: u32) -> Self {
-        Self(
-            ((raw >> 16) & 255) as u8,
-            ((raw >> 8) & 255) as u8,
-            (raw & 255) as u8,
-        )
-    }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub(crate) struct Point {
     x: f64,
     y: f64,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub(crate) struct Dimension {
     w: f64,
     h: f64,
@@ -44,8 +35,7 @@ trait ImageRenderer: ShapeRenderer {
 }
 
 pub(crate) enum Renderable {
-    Rect(Point, Dimension, Color),
-    Frame(Point, Dimension, Color, f64),
+    Rect(Point, Dimension, Style),
 }
 
 // Graphs
@@ -86,6 +76,9 @@ impl<'a> Graph<'a> {
 
     fn renderables(&self) -> Vec<Renderable> {
         let mut prev = Point { x: 0.0, y: 0.0 };
+        let style = Style::color(0xDEAD00)
+            .with_border(2.0)
+            .with_background(0xBADA55);
         self.blocks
             .iter()
             .map(|block| {
@@ -98,7 +91,7 @@ impl<'a> Graph<'a> {
                         w: block.0 * self.base.0,
                         h: self.base.1,
                     },
-                    Color::from(0xDEAD00),
+                    style,
                 );
 
                 prev.x += block.0 * self.base.0;
