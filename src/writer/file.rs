@@ -59,6 +59,7 @@ mod tests {
             assert!(false, "{:#?}", e);
         } else {
             assert!(true, "File created");
+            let _ = std::fs::remove_file("foo.ppm");
         }
     }
 }
