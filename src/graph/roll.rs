@@ -47,21 +47,35 @@ impl<'a> Roll<'a> {
             },
             Style::color(0x060910),
         )];
-        let style = Style::color(0x303030).with_border(0.25);
+        let style = Style::color(0x303030);
 
-        for y in (((mh / 2.0) as usize)..((height - mh / 2.0) as usize)).step_by(baseh as usize) {
-            for x in (((mw / 2.0) as usize)..((width - mw / 2.0) as usize)).step_by(basew as usize)
-            {
-                let rect = Renderable::Rect(
-                    Point {
-                        x: x as f64,
-                        y: y as f64,
-                    },
-                    Dimension { w: basew, h: baseh },
-                    style,
-                );
-                grid.push(rect);
-            }
+        for y in (((mh / 2.0) as usize)..((height - mh / 2.0) as usize) + 1).step_by(baseh as usize)
+        {
+            grid.push(Renderable::Rect(
+                Point {
+                    x: mw / 2.0,
+                    y: y as f64,
+                },
+                Dimension {
+                    w: width - mw,
+                    h: 1.0,
+                },
+                style,
+            ));
+        }
+        for x in (((mw / 2.0) as usize)..((width - mw / 2.0) as usize) + 1).step_by(basew as usize)
+        {
+            grid.push(Renderable::Rect(
+                Point {
+                    x: x as f64,
+                    y: mh / 2.0,
+                },
+                Dimension {
+                    w: 1.0,
+                    h: height - mh,
+                },
+                style,
+            ));
         }
 
         grid
