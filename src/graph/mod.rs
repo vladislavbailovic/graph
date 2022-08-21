@@ -18,7 +18,8 @@ pub trait Graph {
     }
 
     /// Distance between margin and renderables
-    fn padding(&self) -> &Dimension {
-        &Dimension { w: 20.0, h: 20.0 }
+    /// Expressed relative to base block size
+    fn padding(&self) -> &Block {
+        &Block(2.0, 4.0)
     }
 }

@@ -24,10 +24,10 @@ impl<'a> Roll<'a> {
             base,
             blocks,
         };
-        let &Dimension { w: pw, h: ph } = roll.padding();
+        let &Block(dw, dh) = roll.padding();
         let &Dimension { w: mw, h: mh } = roll.margin();
-        roll.size.w += pw + mw;
-        roll.size.h += ph + mh;
+        roll.size.w += (roll.base.0 * dw) + mw;
+        roll.size.h += (roll.base.1 * dh) + mh;
 
         roll
     }
@@ -107,11 +107,11 @@ impl<'a> Graph for Roll<'a> {
     }
 
     fn renderables(&self) -> Vec<Renderable> {
-        let &Dimension { w: pw, h: ph } = self.padding();
+        let &Block(dw, dh) = self.padding();
         let &Dimension { w: mw, h: mh } = self.margin();
         let mut prev = Point {
-            x: pw / 2.0 + mw / 2.0,
-            y: ph / 2.0 + mh / 2.0,
+            x: (self.base.0 * dw) / 2.0 + mw / 2.0,
+            y: (self.base.1 * dh) / 2.0 + mh / 2.0,
         };
         let style = Style::color(0xDEAD00)
             .with_border(2.0)
