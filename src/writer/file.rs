@@ -21,7 +21,7 @@ impl Writer for FileWriter {
         if let Some(header) = header {
             let _ = p.write(header)?;
         }
-        let buffer = graph.draw(Box::new(renderer));
+        let buffer = graph.draw(renderer);
         let _ = p.write(&buffer)?;
         if let Some(footer) = footer {
             let _ = p.write(footer)?;

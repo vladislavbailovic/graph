@@ -44,7 +44,9 @@ pub(crate) enum Renderable {
 pub(crate) trait Graph {
     fn get_blocks(&self) -> &[Block];
     fn renderables(&self) -> Vec<Renderable>;
-    fn draw(&self, renderer: Box<dyn ShapeRenderer>) -> Vec<u8>;
+    fn draw<T>(&self, renderer: T) -> Vec<u8>
+    where
+        T: ShapeRenderer;
     fn size(&self) -> &Dimension;
     fn base(&self) -> &Block;
 }
@@ -88,7 +90,10 @@ impl<'a> Graph for Roll<'a> {
         self.blocks
     }
 
-    fn draw(&self, mut renderer: Box<dyn ShapeRenderer>) -> Vec<u8> {
+    fn draw<T>(&self, mut renderer: T) -> Vec<u8>
+    where
+        T: ShapeRenderer,
+    {
         for rect in self.renderables() {
             renderer.draw(rect);
         }
@@ -149,7 +154,7 @@ mod tests {
             Block(4.0, 2.0),
         ]);
         let renderer = ppm::Renderer::new(&graph.size);
-        let buf = graph.draw(Box::new(renderer));
+        let buf = graph.draw(renderer);
 
         assert_eq!(buf.len(), (graph.size.w * graph.size.h) as usize * 3);
     }
