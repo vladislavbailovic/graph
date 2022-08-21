@@ -50,11 +50,13 @@ pub(crate) trait Graph {
     fn size(&self) -> &Dimension;
     fn base(&self) -> &Block;
 
-    fn padding(&self) -> &Dimension {
+    /// Distance between edge and padding
+    fn margin(&self) -> &Dimension {
         &Dimension { w: 20.0, h: 20.0 }
     }
 
-    fn margin(&self) -> &Dimension {
+    /// Distance between margin and renderables
+    fn padding(&self) -> &Dimension {
         &Dimension { w: 20.0, h: 20.0 }
     }
 }
@@ -88,6 +90,34 @@ impl<'a> Roll<'a> {
         roll.size.h += ph + mh;
 
         roll
+    }
+
+    fn grid(&self) -> Vec<Renderable> {
+        let &Dimension { w: mw, h: mh } = self.margin();
+        let &Dimension {
+            w: width,
+            h: height,
+        } = self.size();
+        let &Block(basew, baseh) = self.base();
+        let mut grid = Vec::new();
+        let style = Style::color(0x303030).with_border(0.25);
+
+        for y in (((mh / 2.0) as usize)..((height - mh / 2.0) as usize)).step_by(baseh as usize) {
+            for x in (((mw / 2.0) as usize)..((width - mw / 2.0) as usize)).step_by(basew as usize)
+            {
+                let rect = Renderable::Rect(
+                    Point {
+                        x: x as f64,
+                        y: y as f64,
+                    },
+                    Dimension { w: basew, h: baseh },
+                    style,
+                );
+                grid.push(rect);
+            }
+        }
+
+        grid
     }
 }
 
@@ -125,25 +155,30 @@ impl<'a> Graph for Roll<'a> {
         let style = Style::color(0xDEAD00)
             .with_border(2.0)
             .with_background(0xBADA55);
-        self.blocks
-            .iter()
-            .map(|block| {
-                let rect = Renderable::Rect(
-                    Point {
-                        x: prev.x,
-                        y: (block.1 * self.base.1) + prev.y,
-                    },
-                    Dimension {
-                        w: block.0 * self.base.0,
-                        h: self.base.1,
-                    },
-                    style,
-                );
+        let mut renderables = self.grid();
+        renderables.append(
+            &mut self
+                .blocks
+                .iter()
+                .map(|block| {
+                    let rect = Renderable::Rect(
+                        Point {
+                            x: prev.x,
+                            y: (block.1 * self.base.1) + prev.y,
+                        },
+                        Dimension {
+                            w: block.0 * self.base.0,
+                            h: self.base.1,
+                        },
+                        style,
+                    );
 
-                prev.x += block.0 * self.base.0;
-                rect
-            })
-            .collect::<Vec<Renderable>>()
+                    prev.x += block.0 * self.base.0;
+                    rect
+                })
+                .collect::<Vec<Renderable>>(),
+        );
+        renderables
     }
 }
 
@@ -187,10 +222,13 @@ mod tests {
             Block(4.0, 2.0),
         ]);
         let rects = graph.renderables();
+        let grid = graph.grid();
 
-        assert_eq!(rects.len(), 4);
+        let idx = grid.len();
 
-        let Renderable::Rect(pos, size, _) = &rects[0];
+        assert_eq!(rects.len(), idx + 4);
+
+        let Renderable::Rect(pos, size, _) = &rects[idx];
         assert_eq!(
             pos.x, 20.0,
             "first rect should be at x=0+half padding+half margin"
@@ -202,7 +240,7 @@ mod tests {
         assert_eq!(size.w, 40.0, "first rect should be at w=40");
         assert_eq!(size.h, 5.0, "first rect should be at h=5");
 
-        let Renderable::Rect(pos, size, _) = &rects[1];
+        let Renderable::Rect(pos, size, _) = &rects[idx + 1];
         assert_eq!(
             pos.x, 60.0,
             "second rect should be at x=40+half padding+half margin"
@@ -214,7 +252,7 @@ mod tests {
         assert_eq!(size.w, 40.0, "second rect should be at w=40");
         assert_eq!(size.h, 5.0, "second rect should be at h=5");
 
-        let Renderable::Rect(pos, size, _) = &rects[2];
+        let Renderable::Rect(pos, size, _) = &rects[idx + 2];
         assert_eq!(
             pos.x, 100.0,
             "third rect should be at x=80+half padding+half margin"
@@ -226,7 +264,7 @@ mod tests {
         assert_eq!(size.w, 40.0, "third rect should be at w=40");
         assert_eq!(size.h, 5.0, "third rect should be at h=5");
 
-        let Renderable::Rect(pos, size, _) = &rects[3];
+        let Renderable::Rect(pos, size, _) = &rects[idx + 3];
         assert_eq!(
             pos.x, 140.0,
             "fourth rect should be at x=120+half padding+half margin"
