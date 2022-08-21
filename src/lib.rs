@@ -19,17 +19,17 @@ pub(crate) struct Dimension {
     h: f64,
 }
 
-struct Block(f64, f64);
+pub(crate) struct Block(f64, f64);
 
 // Shapes
 // ======
 
-trait ShapeRenderer {
+pub(crate) trait ShapeRenderer {
     fn draw(&mut self, shape: Renderable);
     fn get_buffer(&self) -> &[u8];
 }
 
-trait ImageRenderer: ShapeRenderer {
+pub(crate) trait ImageRenderer: ShapeRenderer {
     fn get_header(&self) -> Option<Vec<u8>>;
     fn get_footer(&self) -> Option<Vec<u8>>;
 }
@@ -41,13 +41,21 @@ pub(crate) enum Renderable {
 // Graphs
 // ======
 
-struct Graph<'a> {
+pub(crate) trait Graph {
+    fn get_blocks(&self) -> &[Block];
+    fn renderables(&self) -> Vec<Renderable>;
+    fn draw(&self, renderer: Box<dyn ShapeRenderer>) -> Vec<u8>;
+    fn size(&self) -> &Dimension;
+    fn base(&self) -> &Block;
+}
+
+pub(crate) struct Roll<'a> {
     size: Dimension,
     base: Block,
     blocks: &'a [Block],
 }
 
-impl<'a> Graph<'a> {
+impl<'a> Roll<'a> {
     pub fn new(blocks: &'a [Block]) -> Self {
         let base = Block(10.0, 5.0);
         let width = blocks
@@ -65,8 +73,23 @@ impl<'a> Graph<'a> {
             blocks,
         }
     }
+}
 
-    fn draw(&self, mut renderer: impl ShapeRenderer) -> Vec<u8> {
+impl<'a> Graph for Roll<'a> {
+
+    fn size(&self) -> &Dimension {
+        &self.size
+    }
+
+    fn base(&self) -> &Block {
+        &self.base
+    }
+
+    fn get_blocks(&self) -> &[Block] {
+        self.blocks
+    }
+
+    fn draw(&self, mut renderer: Box<dyn ShapeRenderer>) -> Vec<u8> {
         for rect in self.renderables() {
             renderer.draw(rect);
         }
@@ -107,7 +130,7 @@ mod tests {
 
     #[test]
     fn graph_dimensions_from_blocks() {
-        let graph = Graph::new(&[
+        let graph = Roll::new(&[
             Block(4.0, 1.0),
             Block(4.0, 3.0),
             Block(4.0, 1.0),
@@ -120,21 +143,21 @@ mod tests {
 
     #[test]
     fn graph_draw() {
-        let graph = Graph::new(&[
+        let graph = Roll::new(&[
             Block(4.0, 1.0),
             Block(4.0, 3.0),
             Block(4.0, 1.0),
             Block(4.0, 2.0),
         ]);
         let renderer = ppm::Renderer::new(&graph.size);
-        let buf = graph.draw(renderer);
+        let buf = graph.draw(Box::new(renderer));
 
         assert_eq!(buf.len(), (graph.size.w * graph.size.h) as usize * 3);
     }
 
     #[test]
     fn graph_rects() {
-        let graph = Graph::new(&[
+        let graph = Roll::new(&[
             Block(4.0, 1.0),
             Block(4.0, 3.0),
             Block(4.0, 1.0),

@@ -8,7 +8,7 @@ pub struct FileWriter {
     fname: String,
 }
 impl Writer for FileWriter {
-    fn write(&self, renderer: impl ImageRenderer, graph: &Graph) -> Result<()> {
+    fn write(&self, renderer: impl ImageRenderer + 'static, graph: Box<dyn Graph>) -> Result<()> {
         let mut p = BufWriter::new(File::create(&self.fname)?);
 
         let header = &renderer.get_header();
@@ -17,7 +17,7 @@ impl Writer for FileWriter {
         if let Some(header) = header {
             let _ = p.write(header)?;
         }
-        let buffer = graph.draw(renderer);
+        let buffer = graph.draw(Box::new(renderer));
         let _ = p.write(&buffer)?;
         if let Some(footer) = footer {
             let _ = p.write(footer)?;
@@ -30,11 +30,11 @@ impl Writer for FileWriter {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{ppm::Renderer, Block, Graph};
+    use crate::{ppm::Renderer, Block, Roll};
 
     #[test]
     fn graph_draw_save() {
-        let graph = Graph::new(&[
+        let graph = Roll::new(&[
             Block(4.0, 1.0),
             Block(4.0, 3.0),
             Block(4.0, 1.0),
@@ -43,8 +43,8 @@ mod tests {
         let w = FileWriter {
             fname: String::from("foo.ppm"),
         };
-        let renderer = Renderer::new(&graph.size);
-        if let Err(e) = w.write(renderer, &graph) {
+        let renderer = Renderer::new(&graph.size());
+        if let Err(e) = w.write(renderer, Box::new(graph)) {
             assert!(false, "{:#?}", e);
         } else {
             assert!(true, "File created");
