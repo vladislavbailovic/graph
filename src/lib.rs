@@ -76,7 +76,6 @@ impl<'a> Roll<'a> {
 }
 
 impl<'a> Graph for Roll<'a> {
-
     fn size(&self) -> &Dimension {
         &self.size
     }

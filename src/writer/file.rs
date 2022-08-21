@@ -8,7 +8,11 @@ pub struct FileWriter {
     fname: String,
 }
 impl Writer for FileWriter {
-    fn write(&self, renderer: impl ImageRenderer + 'static, graph: Box<dyn Graph>) -> Result<()> {
+    fn write<T, U>(&self, renderer: T, graph: U) -> Result<()>
+    where
+        T: ImageRenderer + 'static,
+        U: Graph,
+    {
         let mut p = BufWriter::new(File::create(&self.fname)?);
 
         let header = &renderer.get_header();
@@ -44,7 +48,7 @@ mod tests {
             fname: String::from("foo.ppm"),
         };
         let renderer = Renderer::new(&graph.size());
-        if let Err(e) = w.write(renderer, Box::new(graph)) {
+        if let Err(e) = w.write(renderer, graph) {
             assert!(false, "{:#?}", e);
         } else {
             assert!(true, "File created");
