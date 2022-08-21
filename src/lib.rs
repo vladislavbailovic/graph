@@ -99,7 +99,14 @@ impl<'a> Roll<'a> {
             h: height,
         } = self.size();
         let &Block(basew, baseh) = self.base();
-        let mut grid = Vec::new();
+        let mut grid = vec![Renderable::Rect(
+            Point { x: 0.0, y: 0.0 },
+            Dimension {
+                w: width,
+                h: height,
+            },
+            Style::color(0x060910),
+        )];
         let style = Style::color(0x303030).with_border(0.25);
 
         for y in (((mh / 2.0) as usize)..((height - mh / 2.0) as usize)).step_by(baseh as usize) {
