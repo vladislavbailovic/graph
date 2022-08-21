@@ -1,6 +1,6 @@
-mod ppm;
+pub mod ppm;
 mod style;
-mod writer;
+pub mod writer;
 
 use style::*;
 
@@ -8,40 +8,45 @@ use style::*;
 // ==========
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) struct Point {
+pub struct Point {
     x: f64,
     y: f64,
 }
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) struct Dimension {
+pub struct Dimension {
     w: f64,
     h: f64,
 }
 
-pub(crate) struct Block(f64, f64);
+pub struct Block(f64, f64);
+impl Block {
+    pub fn new(w: f64, h: f64) -> Self {
+        Self(w, h)
+    }
+}
 
 // Shapes
 // ======
 
-pub(crate) trait ShapeRenderer {
+pub trait ShapeRenderer {
     fn draw(&mut self, shape: Renderable);
     fn get_buffer(&self) -> &[u8];
 }
 
-pub(crate) trait ImageRenderer: ShapeRenderer {
+pub trait ImageRenderer: ShapeRenderer {
     fn get_header(&self) -> Option<Vec<u8>>;
     fn get_footer(&self) -> Option<Vec<u8>>;
 }
 
-pub(crate) enum Renderable {
+pub enum Renderable {
     Rect(Point, Dimension, Style),
 }
 
 // Graphs
 // ======
 
-pub(crate) trait Graph {
+pub trait Graph {
     fn get_blocks(&self) -> &[Block];
     fn renderables(&self) -> Vec<Renderable>;
     fn draw<T>(&self, renderer: T) -> Vec<u8>
@@ -61,7 +66,7 @@ pub(crate) trait Graph {
     }
 }
 
-pub(crate) struct Roll<'a> {
+pub struct Roll<'a> {
     size: Dimension,
     base: Block,
     blocks: &'a [Block],

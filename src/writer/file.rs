@@ -7,6 +7,13 @@ use crate::{Graph, ImageRenderer};
 pub struct FileWriter {
     fname: String,
 }
+impl FileWriter {
+    pub fn new(fname: &str) -> Self {
+        Self {
+            fname: fname.into(),
+        }
+    }
+}
 impl Writer for FileWriter {
     fn write<T, U>(&self, renderer: T, graph: U) -> Result<()>
     where

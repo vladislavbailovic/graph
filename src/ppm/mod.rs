@@ -1,6 +1,6 @@
 use crate::{Color, Dimension, ImageRenderer, Point, Renderable, ShapeRenderer};
 
-pub(crate) struct Renderer {
+pub struct Renderer {
     size: Dimension,
     buffer: Vec<u8>,
 }
