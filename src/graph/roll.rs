@@ -15,10 +15,8 @@ impl<'a> Roll<'a> {
             .iter()
             .fold(0.0, |total, block| total + block.0 * base.0);
         let minimum = blocks.iter().map(|x|x.1).reduce(f64::min).expect("there has to be minimum");
-        let height = blocks
-            .iter()
-            .fold(0.0, |total, block| (total + block.1 * base.1) - (minimum * base.1));
-        // eprintln!("graph height: {height} because minimum: {minimum}");
+        let maximum = blocks.iter().map(|x|x.1).reduce(f64::max).expect("there has to be maximum");
+        let height = (maximum * base.1) - (minimum * base.1);
         let mut roll = Self {
             size: Dimension {
                 w: width,
