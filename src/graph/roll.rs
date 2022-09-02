@@ -9,7 +9,7 @@ pub struct Roll<'a> {
 
 impl<'a> Roll<'a> {
     pub fn new(blocks: &'a [Block]) -> Self {
-        let base = Block(10.0, 5.0);
+        let base = Block(20.0, 20.0);
         let width = blocks
             .iter()
             .fold(0.0, |total, block| total + block.0 * base.0);
