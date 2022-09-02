@@ -3,6 +3,7 @@ use crate::{Block, Dimension, Point, Renderable, ShapeRenderer, Style};
 
 pub struct Roll<'a> {
     size: Dimension,
+    minimum: f64,
     base: Block,
     blocks: &'a [Block],
 }
@@ -13,14 +14,17 @@ impl<'a> Roll<'a> {
         let width = blocks
             .iter()
             .fold(0.0, |total, block| total + block.0 * base.0);
+        let minimum = blocks.iter().map(|x|x.1).reduce(f64::min).expect("there has to be minimum");
         let height = blocks
             .iter()
-            .fold(0.0, |total, block| total + block.1 * base.1);
+            .fold(0.0, |total, block| (total + block.1 * base.1) - (minimum * base.1));
+        // eprintln!("graph height: {height} because minimum: {minimum}");
         let mut roll = Self {
             size: Dimension {
                 w: width,
                 h: height,
             },
+            minimum,
             base,
             blocks,
         };
@@ -122,10 +126,11 @@ impl<'a> Graph for Roll<'a> {
                 .blocks
                 .iter()
                 .map(|block| {
+                    let delta_y = (block.1 * self.base.1) - (self.minimum * self.base.1);
                     let rect = Renderable::Rect(
                         Point {
                             x: prev.x,
-                            y: (block.1 * self.base.1) + prev.y,
+                            y: delta_y + prev.y,
                         },
                         Dimension {
                             w: block.0 * self.base.0,
