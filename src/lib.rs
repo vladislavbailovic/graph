@@ -27,6 +27,14 @@ impl Block {
     pub fn new(w: f64, h: f64) -> Self {
         Self(w, h)
     }
+
+    pub fn intensity(&self) -> Option<&f64> {
+        Some(&self.1)
+    }
+
+    pub fn duration(&self) -> &f64 {
+        &self.0
+    }
 }
 
 // Shapes
