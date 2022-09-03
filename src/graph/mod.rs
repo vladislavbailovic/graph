@@ -14,12 +14,12 @@ pub trait Graph {
 
     /// Distance between edge and padding
     fn margin(&self) -> &Dimension {
-        &Dimension { w: 20.0, h: 20.0 }
+        &Dimension { w: 40.0, h: 40.0 }
     }
 
     /// Distance between margin and renderables
     /// Expressed relative to base block size
     fn padding(&self) -> &Block {
-        &Block(2.0, 4.0)
+        &Block(0.0, 0.0)
     }
 }

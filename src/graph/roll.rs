@@ -24,7 +24,7 @@ impl<'a> Roll<'a> {
             .map(|x| x.1)
             .reduce(f64::max)
             .expect("there has to be maximum");
-        let height = (maximum * base.1) - (minimum * base.1);
+        let height = ((maximum - minimum) + 1.0) * base.1;
         let mut roll = Self {
             size: Dimension {
                 w: width,
@@ -36,8 +36,8 @@ impl<'a> Roll<'a> {
         };
         let &Block(dw, dh) = roll.padding();
         let &Dimension { w: mw, h: mh } = roll.margin();
-        roll.size.w += (roll.base.0 * dw) + mw;
-        roll.size.h += (roll.base.1 * dh) + mh;
+        roll.size.w += (roll.base.0 * dw * 2.0) + mw * 2.0;
+        roll.size.h += (roll.base.1 * dh * 2.0) + mh * 2.0;
 
         roll
     }
@@ -59,30 +59,30 @@ impl<'a> Roll<'a> {
         )];
         let style = Style::color(0x303030);
 
-        for y in (((mh / 2.0) as usize)..((height - mh / 2.0) as usize) + 1).step_by(baseh as usize)
+        for y in (((mh) as usize)..((height - mh) as usize) + 1 as usize).step_by(baseh as usize)
         {
             grid.push(Renderable::Rect(
                 Point {
-                    x: mw / 2.0,
+                    x: mw,
                     y: y as f64,
                 },
                 Dimension {
-                    w: width - mw,
+                    w: width - mw * 2.0,
                     h: 1.0,
                 },
                 style,
             ));
         }
-        for x in (((mw / 2.0) as usize)..((width - mw / 2.0) as usize) + 1).step_by(basew as usize)
+        for x in (((mw) as usize)..((width - mw) as usize) + 1).step_by(basew as usize)
         {
             grid.push(Renderable::Rect(
                 Point {
                     x: x as f64,
-                    y: mh / 2.0,
+                    y: mh,
                 },
                 Dimension {
                     w: 1.0,
-                    h: height - mh,
+                    h: height - mh * 2.0,
                 },
                 style,
             ));
@@ -121,8 +121,8 @@ impl<'a> Graph for Roll<'a> {
         let &Block(dw, dh) = self.padding();
         let &Dimension { w: mw, h: mh } = self.margin();
         let mut prev = Point {
-            x: (self.base.0 * dw) / 2.0 + mw / 2.0,
-            y: (self.base.1 * dh) / 2.0 + mh / 2.0,
+            x: (self.base.0 * dw) + mw,
+            y: (self.base.1 * dh) + mh,
         };
         let style = Style::color(0xDEAD00)
             .with_border(2.0)
@@ -133,9 +133,9 @@ impl<'a> Graph for Roll<'a> {
                 .blocks
                 .iter()
                 .map(|block| {
-                    let mut delta_y = (block.1 * self.base.1);
+                    let mut delta_y = block.1 * self.base.1;
                     delta_y = delta_y - (self.minimum * self.base.1);
-                    delta_y = (height - (prev.y * 2.0)) - delta_y;
+                    delta_y = (height - prev.y * 2.0 - self.base.1) - delta_y;
                     let rect = Renderable::Rect(
                         Point {
                             x: prev.x,

@@ -22,6 +22,7 @@ pub struct Dimension {
     h: f64,
 }
 
+#[derive(Debug)]
 pub struct Block(f64, f64);
 impl Block {
     pub fn new(w: f64, h: f64) -> Self {
