@@ -5,7 +5,7 @@ pub use hits::Hits;
 mod track;
 pub use track::Track;
 
-use crate::{Block, Point, Dimension, Renderable, ShapeRenderer, Style};
+use crate::{Block, Dimension, Point, Renderable, ShapeRenderer, Style};
 
 pub trait Graph {
     fn get_blocks(&self) -> &[Block];
@@ -55,7 +55,10 @@ pub trait Graph {
             ));
         }
         grid.push(Renderable::Rect(
-            Point { x: mw, y: height - mh },
+            Point {
+                x: mw,
+                y: height - mh,
+            },
             Dimension {
                 w: width - mw * 2.0,
                 h: 1.0,
@@ -73,7 +76,10 @@ pub trait Graph {
             ));
         }
         grid.push(Renderable::Rect(
-            Point { x: width - mw, y: mh },
+            Point {
+                x: width - mw,
+                y: mh,
+            },
             Dimension {
                 w: 1.0,
                 h: height - mh * 2.0,

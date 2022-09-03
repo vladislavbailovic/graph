@@ -108,5 +108,4 @@ impl<'a> Graph for Hits<'a> {
 }
 
 #[cfg(test)]
-mod tests {
-}
+mod tests {}

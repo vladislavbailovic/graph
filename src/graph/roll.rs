@@ -41,7 +41,6 @@ impl<'a> Roll<'a> {
 
         roll
     }
-
 }
 
 impl<'a> Graph for Roll<'a> {
@@ -130,8 +129,16 @@ mod tests {
             Block(4.0, 2.0),
         ]);
 
-        assert_eq!(graph.size.w, (graph.base.0 * 16.0) + (graph.margin().w * 2.0), "graph width");
-        assert_eq!(graph.size.h, (graph.base.1 * 3.0) + (graph.margin().h * 2.0), "graph height");
+        assert_eq!(
+            graph.size.w,
+            (graph.base.0 * 16.0) + (graph.margin().w * 2.0),
+            "graph width"
+        );
+        assert_eq!(
+            graph.size.h,
+            (graph.base.1 * 3.0) + (graph.margin().h * 2.0),
+            "graph height"
+        );
     }
 
     #[test]

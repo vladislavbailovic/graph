@@ -71,13 +71,17 @@ impl<'a> Graph for Track<'a> {
         let mut renderables = self.roll.renderables();
         let offset = self.roll.size().h;
         renderables.append(
-            &mut self.hits.renderables().iter_mut().filter_map(|x| match x {
-                Renderable::Rect(p, d, s) => {
-                    p.y += offset;
-                    Some(Renderable::Rect(*p, *d, *s))
-                },
-            })
-            .collect()
+            &mut self
+                .hits
+                .renderables()
+                .iter_mut()
+                .filter_map(|x| match x {
+                    Renderable::Rect(p, d, s) => {
+                        p.y += offset;
+                        Some(Renderable::Rect(*p, *d, *s))
+                    }
+                })
+                .collect(),
         );
 
         renderables
@@ -85,5 +89,4 @@ impl<'a> Graph for Track<'a> {
 }
 
 #[cfg(test)]
-mod tests {
-}
+mod tests {}
