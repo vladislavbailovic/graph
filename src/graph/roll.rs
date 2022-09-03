@@ -16,13 +16,7 @@ impl<'a> Roll<'a> {
             .fold(0.0, |total, block| total + block.0 * base.0);
         let minimum = blocks
             .iter()
-            .map(|x| if x.1 > 0.0 {
-                    Some(x.1)
-                } else {
-                    None
-                }
-            )
-            .flatten()
+            .filter_map(|x| if x.1 > 0.0 { Some(x.1) } else { None })
             .reduce(f64::min)
             .expect("there has to be minimum");
         let maximum = blocks
@@ -65,13 +59,9 @@ impl<'a> Roll<'a> {
         )];
         let style = Style::color(0x303030);
 
-        for y in (((mh) as usize)..((height - mh) as usize) + 1 as usize).step_by(baseh as usize)
-        {
+        for y in (((mh) as usize)..((height - mh) as usize) + 1_usize).step_by(baseh as usize) {
             grid.push(Renderable::Rect(
-                Point {
-                    x: mw,
-                    y: y as f64,
-                },
+                Point { x: mw, y: y as f64 },
                 Dimension {
                     w: width - mw * 2.0,
                     h: 1.0,
@@ -79,13 +69,9 @@ impl<'a> Roll<'a> {
                 style,
             ));
         }
-        for x in (((mw) as usize)..((width - mw) as usize) + 1).step_by(basew as usize)
-        {
+        for x in (((mw) as usize)..((width - mw) as usize) + 1).step_by(basew as usize) {
             grid.push(Renderable::Rect(
-                Point {
-                    x: x as f64,
-                    y: mh,
-                },
+                Point { x: x as f64, y: mh },
                 Dimension {
                     w: 1.0,
                     h: height - mh * 2.0,
@@ -123,7 +109,10 @@ impl<'a> Graph for Roll<'a> {
     }
 
     fn renderables(&self) -> Vec<Renderable> {
-        let &Dimension{ h: height, w: _width } = self.size();
+        let &Dimension {
+            h: height,
+            w: _width,
+        } = self.size();
         let &Block(dw, dh) = self.padding();
         let &Dimension { w: mw, h: mh } = self.margin();
         let mut prev = Point {
@@ -138,18 +127,18 @@ impl<'a> Graph for Roll<'a> {
             &mut self
                 .blocks
                 .iter()
-                .map(|block| {
+                .filter_map(|block| {
                     if block.1 == 0.0 {
                         prev.x += block.0 * self.base.0;
                         return None;
                     }
                     let mut delta_y = block.1 * self.base.1;
-                    delta_y = delta_y - (self.minimum * self.base.1);
+                    delta_y -= self.minimum * self.base.1;
                     delta_y = (height - prev.y * 2.0 - self.base.1) - delta_y;
                     let rect = Renderable::Rect(
                         Point {
                             x: prev.x,
-                            y: delta_y + prev.y
+                            y: delta_y + prev.y,
                         },
                         Dimension {
                             w: block.0 * self.base.0,
@@ -161,7 +150,6 @@ impl<'a> Graph for Roll<'a> {
                     prev.x += block.0 * self.base.0;
                     Some(rect)
                 })
-                .flatten()
                 .collect::<Vec<Renderable>>(),
         );
         renderables
