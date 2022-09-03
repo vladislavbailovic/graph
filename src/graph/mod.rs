@@ -2,6 +2,8 @@ mod roll;
 pub use roll::Roll;
 mod hits;
 pub use hits::Hits;
+mod track;
+pub use track::Track;
 
 use crate::{Block, Point, Dimension, Renderable, ShapeRenderer, Style};
 
