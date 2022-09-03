@@ -42,62 +42,6 @@ impl<'a> Roll<'a> {
         roll
     }
 
-    fn grid(&self) -> Vec<Renderable> {
-        let &Dimension { w: mw, h: mh } = self.margin();
-        let &Dimension {
-            w: width,
-            h: height,
-        } = self.size();
-        let &Block(basew, baseh) = self.base();
-        let mut grid = vec![Renderable::Rect(
-            Point { x: 0.0, y: 0.0 },
-            Dimension {
-                w: width,
-                h: height,
-            },
-            Style::color(0x060910),
-        )];
-        let style = Style::color(0x303030);
-
-        for y in ((mh as usize)..((height - mh) as usize)).step_by(baseh as usize) {
-            grid.push(Renderable::Rect(
-                Point { x: mw, y: y as f64 },
-                Dimension {
-                    w: width - mw * 2.0,
-                    h: 1.0,
-                },
-                style,
-            ));
-        }
-        grid.push(Renderable::Rect(
-            Point { x: mw, y: height - mh },
-            Dimension {
-                w: width - mw * 2.0,
-                h: 1.0,
-            },
-            style,
-        ));
-        for x in ((mw as usize)..((width - mw) as usize)).step_by(basew as usize) {
-            grid.push(Renderable::Rect(
-                Point { x: x as f64, y: mh },
-                Dimension {
-                    w: 1.0,
-                    h: height - mh * 2.0,
-                },
-                style,
-            ));
-        }
-        grid.push(Renderable::Rect(
-            Point { x: width - mw, y: mh },
-            Dimension {
-                w: 1.0,
-                h: height - mh * 2.0,
-            },
-            style,
-        ));
-
-        grid
-    }
 }
 
 impl<'a> Graph for Roll<'a> {
