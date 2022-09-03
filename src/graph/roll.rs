@@ -16,7 +16,13 @@ impl<'a> Roll<'a> {
             .fold(0.0, |total, block| total + block.0 * base.0);
         let minimum = blocks
             .iter()
-            .map(|x| x.1)
+            .map(|x| if x.1 > 0.0 {
+                    Some(x.1)
+                } else {
+                    None
+                }
+            )
+            .flatten()
             .reduce(f64::min)
             .expect("there has to be minimum");
         let maximum = blocks
@@ -133,6 +139,10 @@ impl<'a> Graph for Roll<'a> {
                 .blocks
                 .iter()
                 .map(|block| {
+                    if block.1 == 0.0 {
+                        prev.x += block.0 * self.base.0;
+                        return None;
+                    }
                     let mut delta_y = block.1 * self.base.1;
                     delta_y = delta_y - (self.minimum * self.base.1);
                     delta_y = (height - prev.y * 2.0 - self.base.1) - delta_y;
@@ -149,8 +159,9 @@ impl<'a> Graph for Roll<'a> {
                     );
 
                     prev.x += block.0 * self.base.0;
-                    rect
+                    Some(rect)
                 })
+                .flatten()
                 .collect::<Vec<Renderable>>(),
         );
         renderables
