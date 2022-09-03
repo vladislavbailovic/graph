@@ -117,6 +117,7 @@ impl<'a> Graph for Roll<'a> {
     }
 
     fn renderables(&self) -> Vec<Renderable> {
+        let &Dimension{ h: height, w: _width } = self.size();
         let &Block(dw, dh) = self.padding();
         let &Dimension { w: mw, h: mh } = self.margin();
         let mut prev = Point {
@@ -132,11 +133,13 @@ impl<'a> Graph for Roll<'a> {
                 .blocks
                 .iter()
                 .map(|block| {
-                    let delta_y = (block.1 * self.base.1) - (self.minimum * self.base.1);
+                    let mut delta_y = (block.1 * self.base.1);
+                    delta_y = delta_y - (self.minimum * self.base.1);
+                    delta_y = (height - (prev.y * 2.0)) - delta_y;
                     let rect = Renderable::Rect(
                         Point {
                             x: prev.x,
-                            y: delta_y + prev.y,
+                            y: delta_y + prev.y
                         },
                         Dimension {
                             w: block.0 * self.base.0,
