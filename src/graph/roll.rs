@@ -69,7 +69,7 @@ impl<'a> Roll<'a> {
                 style,
             ));
         }
-        for x in (((mw) as usize)..((width - mw) as usize) + 1).step_by(basew as usize) {
+        for x in (((mw) as usize)..((width - mw) as usize) + 2_usize).step_by(basew as usize) {
             grid.push(Renderable::Rect(
                 Point { x: x as f64, y: mh },
                 Dimension {
