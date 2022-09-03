@@ -26,7 +26,7 @@ impl ShapeRenderer for Renderer {
 
 impl ImageRenderer for Renderer {
     fn get_header(&self) -> Option<Vec<u8>> {
-        Some(format!("P6 {} {} 255\n", self.size.w, self.size.h).into_bytes())
+        Some(format!("P6 {} {} 255\n", self.size.w as usize, self.size.h as usize).into_bytes())
     }
     fn get_footer(&self) -> Option<Vec<u8>> {
         None
