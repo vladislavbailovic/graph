@@ -1,4 +1,4 @@
-use std::io::{self, Write, Result};
+use std::io::{self, Result, Write};
 
 use super::Writer;
 use crate::{Graph, ImageRenderer};
@@ -6,7 +6,9 @@ use crate::{Graph, ImageRenderer};
 pub struct StdoutWriter;
 
 impl StdoutWriter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 
 impl Writer for StdoutWriter {
@@ -34,13 +36,11 @@ impl Writer for StdoutWriter {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{ppm::Renderer, Block, Roll};
+    use crate::{svg::Renderer, Block, Roll};
 
     #[test]
-    fn simple_graph() {
-        let graph = Roll::new(&[
-            Block(4.0, 1.0),
-        ]);
+    fn stdout_graph() {
+        let graph = Roll::new(&[Block(4.0, 1.0)]);
         let renderer = Renderer::new(&graph.size());
         let w = StdoutWriter::new();
 

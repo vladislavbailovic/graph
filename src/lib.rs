@@ -1,4 +1,5 @@
 pub mod ppm;
+pub mod svg;
 pub mod writer;
 
 mod graph;
