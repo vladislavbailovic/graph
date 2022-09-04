@@ -11,6 +11,12 @@ impl From<u32> for Color {
     }
 }
 
+impl Color {
+    pub fn rgb(&self) -> String {
+        format!("rgb({}, {}, {})", self.0, self.1, self.2)
+    }
+}
+
 #[derive(Copy, Clone)]
 pub struct Style {
     color: Color,
