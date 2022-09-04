@@ -1,5 +1,7 @@
 mod file;
 pub use file::*;
+pub mod stdout;
+pub use stdout::*;
 
 use std::io::Result;
 
@@ -10,15 +12,4 @@ pub trait Writer {
     where
         T: ImageRenderer + 'static,
         U: Graph;
-}
-
-pub struct StdoutWriter;
-impl Writer for StdoutWriter {
-    fn write<T, U>(&self, _renderer: T, _graph: U) -> Result<()>
-    where
-        T: ImageRenderer + 'static,
-        U: Graph,
-    {
-        Ok(())
-    }
 }
