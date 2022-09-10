@@ -52,10 +52,6 @@ impl<'a> Graph for Roll<'a> {
         &self.base
     }
 
-    fn get_blocks(&self) -> &[Block] {
-        self.blocks
-    }
-
     fn draw<T>(&self, mut renderer: T) -> Vec<u8>
     where
         T: ShapeRenderer,

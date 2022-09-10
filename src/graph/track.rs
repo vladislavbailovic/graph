@@ -42,10 +42,6 @@ impl<'a> Graph for Track<'a> {
         &self.base
     }
 
-    fn get_blocks(&self) -> &[Block] {
-        &[]
-    }
-
     /// Children will take care of this
     fn margin(&self) -> &Dimension {
         &Dimension { w: 0.0, h: 0.0 }

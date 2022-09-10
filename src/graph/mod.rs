@@ -8,7 +8,6 @@ pub use track::Track;
 use crate::{Block, Dimension, Point, Renderable, ShapeRenderer, Style};
 
 pub trait Graph {
-    fn get_blocks(&self) -> &[Block];
     fn renderables(&self) -> Vec<Renderable>;
     fn draw<T>(&self, renderer: T) -> Vec<u8>
     where
