@@ -4,6 +4,8 @@ mod hits;
 pub use hits::Hits;
 mod track;
 pub use track::Track;
+mod line;
+pub use line::Line;
 
 use crate::{Block, Dimension, Point, Renderable, ShapeRenderer, Style};
 
