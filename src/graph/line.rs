@@ -69,7 +69,7 @@ impl<'a> Graph for Line<'a> {
             x: hpad,
             y: vpad,
         };
-        let style = Style::color(0x6495ED);
+        let style = Style::color(0x6495ED).with_border(2.0);
         let mut renderables = self.grid();
         renderables.append(
             &mut self
