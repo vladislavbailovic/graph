@@ -10,9 +10,7 @@ pub struct Line<'a> {
 impl<'a> Line<'a> {
     pub fn new(blocks: &'a [Block]) -> Self {
         let base = Block(20.0, 20.0);
-        let width = blocks
-            .iter()
-            .fold(0.0, |total, block| total + block.0);
+        let width = blocks.iter().fold(0.0, |total, block| total + block.0);
         let maximum = blocks
             .iter()
             .map(|x| x.1 * base.1)
@@ -65,10 +63,7 @@ impl<'a> Graph for Line<'a> {
         let &Dimension { w: mw, h: mh } = self.margin();
         let vpad = (self.base.1 * dh) + mh;
         let hpad = (self.base.0 * dw) + mw;
-        let mut prev = Point {
-            x: hpad,
-            y: vpad,
-        };
+        let mut prev = Point { x: hpad, y: vpad };
         let style = Style::color(0x6495ED).with_border(2.0);
         let mut renderables = self.grid();
         renderables.append(

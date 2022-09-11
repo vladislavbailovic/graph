@@ -15,7 +15,7 @@ impl ShapeRenderer for Renderer {
                 if let Some((color, thickness)) = style.get_frame() {
                     self.frame(pos, size, color, thickness);
                 }
-            },
+            }
             Renderable::Line(p1, p2, style) => {
                 if let Some((color, thickness)) = style.get_frame() {
                     self.line(p1, p2, color, thickness);
@@ -117,36 +117,36 @@ impl Renderer {
 
                 if delta > 0.0 {
                     y = y + 1.0;
-                    delta = delta - 2.0*dx;
+                    delta = delta - 2.0 * dx;
                 }
-                delta = delta + 2.0*dy;
+                delta = delta + 2.0 * dy;
             }
         };
         line(p1.x, p2.x, p1.y, p2.y);
         for i in 0..=(thickness as usize) {
-            line(p1.x-(i as f64), p2.x, p1.y, p2.y);
-            line(p1.x+(i as f64), p2.x, p1.y, p2.y);
+            line(p1.x - (i as f64), p2.x, p1.y, p2.y);
+            line(p1.x + (i as f64), p2.x, p1.y, p2.y);
         }
     }
 
     // https://en.wikipedia.org/wiki/Bresenham's_line_algorithm
     // fn line(&mut self, p1: Point, p2: Point, color: &Color, thickness: f64) {
-        // let dx = p1.x - p2.x;
-        // let dy = p2.y - p2.y;
-        // let mut delta = 2.0 * dy - dx;
-        // let mut y = p1.y;
+    // let dx = p1.x - p2.x;
+    // let dy = p2.y - p2.y;
+    // let mut delta = 2.0 * dy - dx;
+    // let mut y = p1.y;
 
-        // for x in (p1.x as usize)..(p2.x as usize) {
-        //     let offset = (y as usize * (self.size.w as usize) * 3) + (x * 3);
-        //     self.buffer[offset] = color.0;
-        //     self.buffer[offset + 1] = color.1;
-        //     self.buffer[offset + 2] = color.2;
+    // for x in (p1.x as usize)..(p2.x as usize) {
+    //     let offset = (y as usize * (self.size.w as usize) * 3) + (x * 3);
+    //     self.buffer[offset] = color.0;
+    //     self.buffer[offset + 1] = color.1;
+    //     self.buffer[offset + 2] = color.2;
 
-        //     if delta > 0.0 {
-        //         y = y + 1.0;
-        //         delta = delta - 2.0*dx;
-        //     }
-        //     delta = delta + 2.0*dy;
-        // }
+    //     if delta > 0.0 {
+    //         y = y + 1.0;
+    //         delta = delta - 2.0*dx;
+    //     }
+    //     delta = delta + 2.0*dy;
+    // }
     // }
 }

@@ -31,7 +31,7 @@ impl ShapeRenderer for Renderer {
                 if let Some((color, thickness)) = style.get_frame() {
                     self.frame(pos, size, color, thickness);
                 }
-            },
+            }
             Renderable::Line(p1, p2, style) => {
                 if let Some((color, thickness)) = style.get_frame() {
                     self.line(p1, p2, color, thickness);
