@@ -116,10 +116,10 @@ impl Renderer {
                 self.buffer[offset + 2] = color.2;
 
                 if delta > 0.0 {
-                    y = y + 1.0;
-                    delta = delta - 2.0 * dx;
+                    y += 1.0;
+                    delta -= 2.0 * dx;
                 }
-                delta = delta + 2.0 * dy;
+                delta += 2.0 * dy;
             }
         };
         line(p1.x, p2.x, p1.y, p2.y);

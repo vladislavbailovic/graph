@@ -3,11 +3,12 @@ use std::io::{self, Result, Write};
 use super::Writer;
 use crate::{Graph, ImageRenderer};
 
+#[derive(Default)]
 pub struct StdoutWriter;
 
 impl StdoutWriter {
     pub fn new() -> Self {
-        Self
+        Self::default()
     }
 }
 
@@ -22,12 +23,12 @@ impl Writer for StdoutWriter {
         let footer = &renderer.get_footer();
 
         if let Some(header) = header {
-            stdout.write(header)?;
+            let _ = stdout.write(header)?;
         }
         let buffer = graph.draw(renderer);
-        stdout.write(&buffer)?;
+        let _ = stdout.write(&buffer)?;
         if let Some(footer) = footer {
-            stdout.write(footer)?;
+            let _ = stdout.write(footer)?;
         }
         Ok(())
     }

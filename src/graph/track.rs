@@ -71,15 +71,15 @@ impl<'a> Graph for Track<'a> {
                 .hits
                 .renderables()
                 .iter_mut()
-                .filter_map(|x| match x {
+                .map(|x| match x {
                     Renderable::Rect(p, d, s) => {
                         p.y += offset;
-                        Some(Renderable::Rect(*p, *d, *s))
+                        Renderable::Rect(*p, *d, *s)
                     }
                     Renderable::Line(p1, p2, s) => {
                         p1.y += offset;
                         p2.y += offset;
-                        Some(Renderable::Line(*p1, *p2, *s))
+                        Renderable::Line(*p1, *p2, *s)
                     }
                 })
                 .collect(),
