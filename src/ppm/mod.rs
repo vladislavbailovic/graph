@@ -16,7 +16,13 @@ impl ShapeRenderer for Renderer {
                     self.frame(pos, size, color, thickness);
                 }
             },
-            _ => {}
+            Renderable::Line(p1, p2, style) => {
+                if let Some((color, thickness)) = style.get_frame() {
+                    self.line(p1, p2, color, thickness);
+                } else if style.has_fill() {
+                    self.line(p1, p2, style.get_color(), 1.0);
+                }
+            }
         };
     }
 
@@ -93,6 +99,27 @@ impl Renderer {
             for x in (((pos.x + size.w) - thickness) as usize)..((pos.x + size.w) as usize) {
                 pixel(x, y);
             }
+        }
+    }
+
+    // https://en.wikipedia.org/wiki/Bresenham's_line_algorithm
+    fn line(&mut self, p1: Point, p2: Point, color: &Color, thickness: f64) {
+        let dx = p1.x - p2.x;
+        let dy = p2.y - p2.y;
+        let mut D = 2.0 * dy - dx;
+        let mut y = p1.y;
+
+        for x in (p1.x as usize)..(p2.x as usize) {
+            let offset = (y as usize * (self.size.w as usize) * 3) + (x * 3);
+            self.buffer[offset] = color.0;
+            self.buffer[offset + 1] = color.1;
+            self.buffer[offset + 2] = color.2;
+
+            if D > 0.0 {
+                y = y + 1.0;
+                D = D - 2.0*dx;
+            }
+            D = D + 2.0*dy;
         }
     }
 }
