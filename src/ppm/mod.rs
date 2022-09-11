@@ -15,7 +15,8 @@ impl ShapeRenderer for Renderer {
                 if let Some((color, thickness)) = style.get_frame() {
                     self.frame(pos, size, color, thickness);
                 }
-            }
+            },
+            _ => {}
         };
     }
 

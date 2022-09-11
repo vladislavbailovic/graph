@@ -31,6 +31,13 @@ impl ShapeRenderer for Renderer {
                 if let Some((color, thickness)) = style.get_frame() {
                     self.frame(pos, size, color, thickness);
                 }
+            },
+            Renderable::Line(p1, p2, style) => {
+                if let Some((color, thickness)) = style.get_frame() {
+                    self.line(p1, p2, color, thickness);
+                } else if style.has_fill() {
+                    self.line(p1, p2, style.get_color(), 1.0);
+                }
             }
         }
     }
@@ -72,6 +79,19 @@ impl Renderer {
             size.h,
             color.rgb(),
             thickness
+        );
+        self.buffer.append(&mut rect.into_bytes());
+    }
+
+    fn line(&mut self, p1: Point, p2: Point, color: &Color, thickness: f64) {
+        let rect = format!(
+            "<line x1='{}' y1='{}' x2='{}' y2='{}' stroke='{}' stroke-width='{}' />\n",
+            p1.x,
+            p1.y,
+            p2.x,
+            p2.y,
+            color.rgb(),
+            thickness,
         );
         self.buffer.append(&mut rect.into_bytes());
     }

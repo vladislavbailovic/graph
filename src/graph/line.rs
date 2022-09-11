@@ -12,7 +12,7 @@ impl<'a> Line<'a> {
         let base = Block(20.0, 20.0);
         let width = blocks
             .iter()
-            .fold(0.0, |total, block| total + block.0 * base.0);
+            .fold(0.0, |total, block| total + block.0);
         let maximum = blocks
             .iter()
             .map(|x| x.1 * base.1)
@@ -63,39 +63,40 @@ impl<'a> Graph for Line<'a> {
         } = self.size();
         let &Block(dw, dh) = self.padding();
         let &Dimension { w: mw, h: mh } = self.margin();
+        let vpad = (self.base.1 * dh) + mh;
+        let hpad = (self.base.0 * dw) + mw;
         let mut prev = Point {
-            x: (self.base.0 * dw) + mw,
-            y: (self.base.1 * dh) + mh,
+            x: hpad,
+            y: vpad,
         };
-        let style = Style::color(0xBADA55)
-            .with_border(2.0)
-            .with_background(0x33EF33);
+        let style = Style::color(0x6495ED);
         let mut renderables = self.grid();
         renderables.append(
             &mut self
                 .blocks
                 .iter()
                 .filter_map(|block| {
-                    if block.1 == 0.0 {
-                        prev.x += block.0;
-                        return None;
-                    }
                     let mut delta_y = block.1 * self.base.1;
-                    delta_y = (height - prev.y * 2.0) - delta_y;
-                    let rect = Renderable::Rect(
-                        Point {
-                            x: prev.x,
-                            y: delta_y + prev.y,
-                        },
-                        Dimension {
-                            w: 1.0,
-                            h: block.1 * self.base.1,
-                        },
-                        style,
-                    );
+                    delta_y = (height - vpad) - delta_y;
+                    let rect = if prev.x != hpad {
+                        Some(Renderable::Line(
+                            Point {
+                                x: prev.x,
+                                y: prev.y,
+                            },
+                            Point {
+                                x: prev.x + block.0,
+                                y: delta_y,
+                            },
+                            style,
+                        ))
+                    } else {
+                        None
+                    };
 
                     prev.x += block.0;
-                    Some(rect)
+                    prev.y = delta_y;
+                    rect
                 })
                 .collect::<Vec<Renderable>>(),
         );

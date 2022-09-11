@@ -54,4 +54,5 @@ pub trait ImageRenderer: ShapeRenderer {
 
 pub enum Renderable {
     Rect(Point, Dimension, Style),
+    Line(Point, Point, Style),
 }
