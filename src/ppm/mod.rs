@@ -1,4 +1,5 @@
 use crate::{Color, Dimension, ImageRenderer, Point, Renderable, ShapeRenderer};
+use rsound_output::*;
 
 pub struct Renderer {
     size: Dimension,
@@ -25,13 +26,15 @@ impl ShapeRenderer for Renderer {
             }
         };
     }
+}
 
+impl Buffer for Renderer {
     fn get_buffer(&self) -> &[u8] {
         &self.buffer
     }
 }
 
-impl ImageRenderer for Renderer {
+impl OutputRenderer for Renderer {
     fn get_header(&self) -> Option<Vec<u8>> {
         Some(format!("P6 {} {} 255\n", self.size.w as usize, self.size.h as usize).into_bytes())
     }
@@ -39,6 +42,8 @@ impl ImageRenderer for Renderer {
         None
     }
 }
+
+impl ImageRenderer for Renderer {}
 
 impl Renderer {
     pub fn new(size: &Dimension) -> Self {

@@ -43,7 +43,7 @@ impl<'a> Graph for Line<'a> {
         &self.base
     }
 
-    fn draw<T>(&self, mut renderer: T) -> Vec<u8>
+    fn draw<T>(&self, renderer: &mut T) -> Vec<u8>
     where
         T: ShapeRenderer,
     {

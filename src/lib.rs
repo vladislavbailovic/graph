@@ -1,3 +1,4 @@
+use rsound_output::*;
 pub mod ppm;
 pub mod svg;
 pub mod writer;
@@ -42,15 +43,11 @@ impl Block {
 // Shapes
 // ======
 
-pub trait ShapeRenderer {
+pub trait ShapeRenderer: Buffer {
     fn draw(&mut self, shape: Renderable);
-    fn get_buffer(&self) -> &[u8];
 }
 
-pub trait ImageRenderer: ShapeRenderer {
-    fn get_header(&self) -> Option<Vec<u8>>;
-    fn get_footer(&self) -> Option<Vec<u8>>;
-}
+pub trait ImageRenderer: ShapeRenderer + OutputRenderer {}
 
 pub enum Renderable {
     Rect(Point, Dimension, Style),

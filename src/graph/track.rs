@@ -52,7 +52,7 @@ impl<'a> Graph for Track<'a> {
         &Block(0.0, 0.0)
     }
 
-    fn draw<T>(&self, mut renderer: T) -> Vec<u8>
+    fn draw<T>(&self, renderer: &mut T) -> Vec<u8>
     where
         T: ShapeRenderer,
     {

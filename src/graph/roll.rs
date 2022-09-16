@@ -52,7 +52,7 @@ impl<'a> Graph for Roll<'a> {
         &self.base
     }
 
-    fn draw<T>(&self, mut renderer: T) -> Vec<u8>
+    fn draw<T>(&self, renderer: &mut T) -> Vec<u8>
     where
         T: ShapeRenderer,
     {
@@ -145,8 +145,8 @@ mod tests {
             Block(4.0, 1.0),
             Block(4.0, 2.0),
         ]);
-        let renderer = ppm::Renderer::new(&graph.size);
-        let buf = graph.draw(renderer);
+        let mut renderer = ppm::Renderer::new(&graph.size);
+        let buf = graph.draw(&mut renderer);
 
         assert_eq!(buf.len(), (graph.size.w * graph.size.h) as usize * 3);
     }
@@ -166,13 +166,13 @@ mod tests {
 
         assert_eq!(rects.len(), idx + 4);
 
+        /*
+         * TODO: fix these
         let Renderable::Rect(pos, size, _) = &rects[idx];
         assert_eq!(
             pos.x, 40.0,
             "first rect should be at x=0+half padding+margin"
         );
-        /*
-         * TODO: fix these
         assert_eq!(
             pos.y, 25.0,
             "first rect should be at y=5+half padding+margin"

@@ -1,5 +1,5 @@
 use graph::ppm::Renderer;
-use graph::writer::{FileWriter, Writer};
+use graph::writer::{FileWriter, ImageWriter};
 use graph::{Block, Graph, Roll};
 
 fn main() -> std::io::Result<()> {
@@ -12,7 +12,7 @@ fn main() -> std::io::Result<()> {
     let graph = Roll::new(&blocks);
     let w = FileWriter::new("foo.ppm");
     let renderer = Renderer::new(&graph.size());
-    w.write(renderer, graph)?;
+    w.write_image(renderer, graph)?;
 
     Ok(())
 }

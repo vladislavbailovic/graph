@@ -11,7 +11,7 @@ use crate::{Block, Dimension, Point, Renderable, ShapeRenderer, Style};
 
 pub trait Graph {
     fn renderables(&self) -> Vec<Renderable>;
-    fn draw<T>(&self, renderer: T) -> Vec<u8>
+    fn draw<T>(&self, renderer: &mut T) -> Vec<u8>
     where
         T: ShapeRenderer;
     fn size(&self) -> &Dimension;
